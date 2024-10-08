@@ -1,0 +1,830 @@
+@extends('new_layout.main')
+
+@section('content')
+<div class="product-status mg-b-15">
+    <div class="container-fluid">
+        <div class="row">
+            @include('new_layout.flash')
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 30px">
+                <div class="product-status-wrap">
+                    <h4 style="display: contents;">Customers Demo List</h4>
+                    <div class="button-div" style="float:right;">
+
+                        <a href="{{route('demo.createcustomer')}}" class="btn btn-primary">Schedule New Demo</a>
+                        <a href="javascript:;" class="btn btn-primary" id="refreshButton" style="fload-right"> <i
+                            class="refresh fa fa-refresh"
+                            aria-hidden="true"></i>&nbsp;Reload</a>
+                    </div>
+
+                    <div class="col-lg-12 col-md-6 col-sm-6 col-xs-12" style="margin-top:50px;">
+                        <form class="" action="{{route('chemxpert.filter')}}" id="submitFilterForm" method="post">
+                            @csrf
+                            <div class="row">
+                                <div class="col-sm-12">
+
+
+                                    <div class="col-sm-1"></div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <br>
+                    <div class="asset-inner">
+                        <table id="demoCustomer" class="table table-bordered" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" id="selectAll" />
+                                </th>
+                                <th>ID</th>
+                                <th>Customer Name</th>
+                                <th>Email</th>
+                                <th>Contact Number</th>
+                                <th>Website for Demo</th>
+                                <th>Demo Status</th>
+                                <th>Order Status</th>
+                                <th>Created By</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Reschedule Modal -->
+<div class="modal fade" id="rescheduleModal" tabindex="-1" role="dialog" aria-labelledby="rescheduleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="rescheduleModalLabel">Reschedule Demo</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Reschedule Form -->
+        <form id="rescheduleForm">
+            @csrf
+            <input type="hidden" name="client_id" id="client_id">
+             <input type="hidden" name="website_id" id="website_id">
+             <input type="hidden" name="website_demo" id="website_demo">
+            <div class="form-group">
+                <label for="demo_scheduled_date">Scheduled Date</label>
+                <input type="date" class="form-control" name="demo_scheduled_date" id="demo_scheduled_date">
+                <div class="invalid-feedback" id="demo_scheduled_date_error"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="demo_scheduled_time">Scheduled Time</label>
+                <input type="time" class="form-control" name="demo_scheduled_time" id="demo_scheduled_time">
+                <div class="invalid-feedback" id="demo_scheduled_time_error"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="meeting_link">Meeting Link</label>
+                <input type="url" class="form-control" name="meeting_link" id="meeting_link">
+                <div class="invalid-feedback" id="meeting_link_error"></div>
+            </div>
+            <div class="form-group text-center">
+                <button type="submit" class="btn btn-primary">Reschedule</button>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Edit Modal -->
+<div class="modal fade" id="editDemoModal" tabindex="-1" role="dialog" aria-labelledby="editDemoModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editDemoModalLabel">Update Client Details</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Client Details Form -->
+        <form id="clientDetailsForm">
+            @csrf
+            <input type="hidden" name="client_id" id="client_id">
+
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <label for="contact_person">Contact Person</label>
+                    <input type="text" class="form-control" name="contact_person" id="contact_person">
+                    <div class="invalid-feedback" id="contact_person_error"></div>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" name="email" id="email">
+                    <div class="invalid-feedback" id="email_error"></div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <label for="contact_number">Contact Number</label>
+                    <input type="tel" class="form-control" name="contact_number" id="contact_number">
+                    <div class="invalid-feedback" id="contact_number_error"></div>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="company_name">Company Name</label>
+                    <input type="text" class="form-control" name="company_name" id="company_name">
+                    <div class="invalid-feedback" id="company_name_error"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="address">Address</label>
+                <textarea class="form-control" name="address" id="address"></textarea>
+                <div class="invalid-feedback" id="address_error"></div>
+            </div>
+
+            <div class="form-group text-center">
+                <button type="submit" class="btn btn-primary">Update Details</button>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+@push('scripts')
+<script>
+$(document).ready(function() {
+    var dataTable = $('#demoCustomer').DataTable({
+        scrollX: true,
+        scrollY: true,
+        paging: true,
+        responsive: true,
+        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+        pageLength: 10,
+        serverSide: true,
+        processing: true,
+        ajax: {
+            url: '{{ route("demo.customerlist") }}',
+            type: 'GET'
+        },
+        columns: [
+            {
+                data: null,
+                orderable: false,
+                searchable: false,
+                render: function(data, type, row) {
+                    return '<input type="checkbox" class="rowCheckbox" value="' + row.id + '">';
+                }
+            },
+            { data: 'id', name: 'id' },
+            { data: 'contact_person', name: 'contact_person' },
+            { data: 'email', name: 'email' },
+            { data: 'contact_number', name: 'contact_number' },
+            { data: 'website_for_demo', name: 'website_for_demo' },
+            {
+            data: 'demo_status',
+            name: 'demo_status',
+            orderable: false,
+            searchable: false,
+            render: function(data, type, row) {
+
+                return `
+                    <select class="form-control demo-status" data-id="${row.website_id}" data-email="${row.email}" data-website-for-demo="${row.website_for_demo}">
+                        <option value="scheduled" ${data === 'scheduled' ? 'selected' : ''}>Scheduled</option>
+                        <option value="rescheduled" ${data === 'rescheduled' ? 'selected' : ''}>Rescheduled</option>
+                        <option value="done" ${data === 'done' ? 'selected' : ''}>Done</option>
+                    </select>
+                `;
+            }
+        },
+        {
+            data: 'order_status',
+            name: 'order_status',
+            orderable: false,
+            searchable: false,
+            render: function(data, type, row) {
+
+                return `
+                    <select class="form-control order-status" data-id="${row.website_id}">
+                        <option value="pending" ${data === 'pending' ? 'selected' : ''}>Pending</option>
+                        <option value="done" ${data === 'done' ? 'selected' : ''}>Done</option>
+                    </select>
+                `;
+            }
+        },
+            { data: 'created_by', name: 'created_by' },
+            { data: 'action', name: 'action', orderable: false, searchable: false },
+        ],
+        order: [[1, 'desc']],
+        error: function(xhr, status, error) {
+            console.error('DataTable Error:', error);
+        }
+    });
+
+    // Select/Deselect all checkboxes
+    $('#selectAll').on('change', function() {
+        $('.rowCheckbox').prop('checked', this.checked);
+    });
+
+   // Reschedule Demo
+   $(document).on('click', '.reschedule', function() {
+    var websiteId = $(this).data('website-id');  // Get website-id
+    var clientId = $(this).data('client-id');    // Get client-id
+    var websiteForDemo = $(this).data('website-for-demo');
+    $('#rescheduleForm')[0].reset();
+    $('#client_id').val(''); // Reset hidden input fields
+    $('#website_id').val('');
+    $('#website_for_demo').val('').prop('disabled', false); // Reset and enable the website field
+
+    // Clear previous validation errors
+    $('.invalid-feedback').text(''); // Clear the error messages
+    $('.form-control').removeClass('is-invalid');
+    $('#client_id').val(clientId); // Set the client_id in the hidden input
+    $('#website_id').val(websiteId);
+    $('#website_demo').val(websiteForDemo);
+    $('#rescheduleModalLabel').text('Reschedule Demo for ' + websiteForDemo);
+    $('#rescheduleModal').modal('show'); // Show the modal with the form
+
+    });
+
+    $(document).on('submit', '#rescheduleForm', function(e) {
+    e.preventDefault(); // Prevent default form submission
+
+    // Clear previous error messages
+    $('.invalid-feedback').text('');
+    $('.form-control').removeClass('is-invalid');
+
+    // Gather form data
+    var formData = $(this).serialize();
+
+    $.ajax({
+        url: '{{ route("demo.reschedule") }}',
+        type: 'POST',
+        data: formData,
+        success: function(response) {
+            if (response.success) {
+                Swal.fire({
+                    title: 'Success',
+                    text: response.message,
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    location.reload(); // Reload page on success
+                });
+            } else {
+                alert('Failed to reschedule: ' + response.message);
+            }
+        },
+        error: function(xhr) {
+            var errors = xhr.responseJSON.errors;
+            // Show validation errors
+            if (errors) {
+                $.each(errors, function(key, value) {
+                    $('#' + key).addClass('is-invalid');
+                    $('#' + key + '_error').text(value[0]);
+                });
+            }
+        }
+    });
+});
+
+// Event listener for the 'demo-status' change
+$('#demoCustomer').on('change', '.demo-status', function() {
+    var websiteId = $(this).data('id');
+    var email = $(this).data('email');
+    var websiteForDemo = $(this).data('website-for-demo');
+    var newStatus = $(this).val();
+
+
+    // AJAX call to update the demo status
+    if (newStatus === 'done') {
+        var apiRoutes = {
+        "chemxpert.com": "https://chemxpert.com/api/update-demo-status",
+        "intellimex.com": "https://intellimex.com/api/update-demo-status",
+        "clival.com": "https://clival.com/api/update-demo-status",
+        "chemgentia.com": "https://chemgentia.com/api/update-demo-status"
+    };
+    var apiUrl = apiRoutes[websiteForDemo];
+    if (!apiUrl) {
+        alert('Invalid website selected');
+        return;
+    }
+    $.ajax({
+        url: '{{ route("demo.updateDemoStatus") }}',
+        type: 'POST',
+        data: {
+            _token: '{{ csrf_token() }}', // For CSRF protection in Laravel
+            website_id: websiteId,
+            website_for_demo : websiteForDemo,
+            email : email,
+            demo_status: newStatus
+        },
+        success: function(response) {
+
+                // If the status is set to 'done', send an email
+                $.ajax({
+                    url: apiUrl,
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        website_id: websiteId,
+                        website_for_demo : websiteForDemo,
+                        email : email
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            title: 'Demo status updated and mail sent with feedback form successfully',
+                            icon: 'success',
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Email Error:', error);
+                    }
+                });
+
+
+        },
+        error: function(xhr, status, error) {
+            console.error('Status Update Error:', error);
+        }
+    });
+}
+});
+
+// End Reschedule Demo
+
+   $(document).on('click', '.edit', function() {
+    var client_id = $(this).data('id');
+
+    console.log('Client ID:', client_id);
+
+
+    $.ajax({
+        url: 'customer/edit/' + client_id,
+        type: 'GET',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(response) {
+            console.log('Response:', response); // Log the response
+            $('#client_id').val(response.id);
+            $('#contact_person').val(response.contact_person);
+            $('#email').val(response.email);
+            $('#contact_number').val(response.contact_number);
+            $('#company_name').val(response.company_name);
+            $('#address').val(response.address);
+            $('#editDemoModal').modal('show');
+        },
+        error: function(xhr, status, error) {
+            console.log("Error status: ", status);
+            console.log("Error details: ", error);
+            console.log("Server response: ", xhr.responseText);
+        }
+    });
+});
+
+$('#clientDetailsForm').on('submit', function(e) {
+    e.preventDefault(); // Prevent the default form submission
+
+    // Create an object to hold the form data
+    var formData = {
+        _token: '{{ csrf_token() }}', // For CSRF protection in Laravel
+        client_id: $('#client_id').val(), // Get client_id from the hidden field
+        contact_person: $('#contact_person').val(),
+        email: $('#email').val(),
+        contact_number: $('#contact_number').val(),
+        company_name: $('#company_name').val(),
+        address: $('#address').val()
+    };
+
+    console.log('Form Data:', formData); // Log the form data for debugging
+
+    $.ajax({
+        url: 'customers/update', // Route for updating client details
+        type: 'POST',
+
+        data: formData,  // <-- You need to send formData here
+        success: function(response) {
+            Swal.fire({
+                title: 'Success!',
+                text: response.message, // Display the response message
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#editDemoModal').modal('hide'); // Hide the modal
+                    location.reload();
+                }
+            }); // Show success message
+
+        },
+        error: function(xhr) {
+            if (xhr.status === 422) { // Validation error
+                var errors = xhr.responseJSON.errors;
+                for (var field in errors) {
+                    $('#' + field + '_error').text(errors[field][0]); // Show validation error
+                }
+            } else {
+                console.log("Error:", xhr.responseText);
+            }
+        }
+    });
+});
+    $(document).on('click', '.send-email', function() {
+    var clientId = $(this).data('client-id');
+    var websiteForDemo = $(this).data('website-for-demo');
+    var email = $(this).data('email');
+    var button = $(this);
+
+
+    var apiRoutes = {
+        "chemxpert.com": "https://chemxpert.com/api/send-demo-cridential",
+        "intellimex.com": "https://intellimex.com/api/send-demo-cridential",
+        "clival.com": "https://clival.com/api/send-demo-cridential",
+        "chemgentia.com": "https://chemgentia.com/api/send-demo-cridential"
+    };
+
+
+    var apiUrl = apiRoutes[websiteForDemo];
+
+    if (!apiUrl) {
+        alert('Invalid website selected');
+        return;
+    }
+
+
+    button.html('<i class="fa fa-spinner fa-spin"></i> Sending...').prop('disabled', true);
+
+
+    $.ajax({
+        url: '{{ route("demo.getScheduleInfo") }}',
+        type: 'GET',
+        data: {
+            client_id: clientId,
+            website_for_demo: websiteForDemo
+        },
+        success: function(response) {
+            var scheduledDate = response.demo_scheduled_date;
+            var scheduledTime = response.demo_scheduled_time;
+            var meetingLink = response.meeting_link;
+
+
+            $.ajax({
+                url: apiUrl,
+                type: 'POST',
+                data: {
+                    email: email,
+                    website_for_demo: websiteForDemo,
+                    demo_scheduled_date: scheduledDate,
+                    demo_scheduled_time: scheduledTime,
+                    meeting_link: meetingLink
+                },
+                success: function(response) {
+                    alert('Mail sent successfully!');
+                    button.html('<i class="fa fa-envelope" aria-hidden="true"></i> Send Mail').prop('disabled', false);
+                },
+                error: function(xhr) {
+                    console.log(xhr);
+                    alert('An error occurred while sending the mail. Please try again.');
+                    button.html('<i class="fa fa-envelope" aria-hidden="true"></i> Send Mail').prop('disabled', false);
+                }
+            });
+        },
+        error: function(xhr) {
+            alert('An error occurred while fetching schedule info. Please try again.');
+            button.html('<i class="fa fa-envelope" aria-hidden="true"></i> Send Mail').prop('disabled', false);
+        }
+    });
+});
+
+
+});
+</script>
+@endpush
+@endsection
+
+
+
+=======================================================================================================
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use DataTables;
+use App\Classes\AuthCondition;
+use Auth;
+use Config;
+use DB;
+
+class CustomerDemoController extends Controller
+{
+    public function index(Request $request)
+    {
+        if ($request->ajax()) {
+
+           $demoClientRecords = DB::table('demo_client_records')
+            ->join('users', 'demo_client_records.staff_id', '=', 'users.id')
+            ->join('demo_order_status', 'demo_client_records.id', '=', 'demo_order_status.client_id') // Join with demo_order_status
+            ->select([
+                'demo_client_records.id',
+                'demo_client_records.contact_person',
+                'demo_client_records.email',
+                'demo_client_records.contact_number',
+                'demo_order_status.website_for_demo',
+                'demo_order_status.id as website_id',
+                'demo_order_status.client_id as client_id',
+                'demo_order_status.demo_status',
+                'demo_order_status.order_status',
+                'users.name as created_by',
+            ]);
+
+            return DataTables::of($demoClientRecords)
+            ->addColumn('action', function($row) {
+                return '
+                    <button class="btn btn-warning btn-sm reschedule" data-website-id="' . $row->website_id . '" data-client-id="' . $row->client_id .'" data-website-for-demo="' . $row->website_for_demo .'">
+                        <i class="fa fa-calendar" aria-hidden="true"></i> Reschedule
+                    </button>
+                    <button class="btn btn-info btn-sm edit" data-id="' . $row->id . '">
+                        <i class="fa fa-pencil" aria-hidden="true"></i> Edit
+                    </button>
+                    <button class="btn btn-success btn-sm send-email" data-client-id="' . $row->client_id .'" data-website-for-demo="' . $row->website_for_demo .'" data-email="' . $row->email .'">
+                        <i class="fa fa-envelope" aria-hidden="true"></i> Send Mail
+                    </button>
+                ';
+            })
+            ->make(true);
+            }
+
+            return view('customer_demo.index');
+    }
+
+    public function create()
+    {
+        return view('customer_demo.create');
+    }
+
+    public function store_customer(Request $request){
+
+        $request->validate([
+        'contact_person' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'contact_number' => 'required|string|max:15',
+        'company_name' => 'required|string|max:255',
+        'demo_scheduled_date' => 'required|date',
+        'demo_scheduled_time' => 'required',
+        'meeting_link' => 'nullable|url',
+        'website' => 'required|string',
+        'address' => 'required|string',
+    ]);
+
+    try {
+        // Check if the email already exists in demo_client_records
+        $clientRecord = DB::table('demo_client_records')
+            ->where('email', $request->email)
+            ->first();
+
+        $orderStatusId = null;
+        $clientId = null;  // Initialize $clientId in the outer scope
+
+        DB::transaction(function () use ($request, &$orderStatusId, &$clientId, $clientRecord) {
+            if ($clientRecord) {
+                // Email exists, use the existing client id
+                $clientId = $clientRecord->id;
+
+                // Check if the website is already scheduled in demo_order_status
+                $websiteExists = DB::table('demo_order_status')
+                    ->where('client_id', $clientRecord->id)
+                    ->where('website_for_demo', $request->website)
+                    ->first();
+
+                if ($websiteExists) {
+                    // If the website already exists, return a message
+                    throw new \Exception('Website has already been scheduled with this email.');
+                } else {
+
+                    $orderStatusId = DB::table('demo_order_status')->insertGetId([
+                        'client_id' => $clientId,
+                        'staff_id' => auth()->user()->id,
+                        'website_for_demo' => $request->website,
+                        'demo_scheduled_date' => $request->demo_scheduled_date,
+                        'demo_scheduled_time' => $request->demo_scheduled_time,
+                        'meeting_link' => $request->meeting_link,
+                        'demo_status' => 'scheduled',
+                        'order_status' => 'pending',
+
+                    ]);
+                }
+            } else {
+
+                $clientId = DB::table('demo_client_records')->insertGetId([
+                    'contact_person' => $request->contact_person,
+                    'email' => $request->email,
+                    'contact_number' => $request->contact_number,
+                    'company_name' => $request->company_name,
+                    'address' => $request->address,
+                    'staff_id' => auth()->user()->id,
+                ]);
+
+
+                $orderStatusId = DB::table('demo_order_status')->insertGetId([
+                    'client_id' => $clientId,
+                    'staff_id' => auth()->user()->id,
+                    'website_for_demo' => $request->website,
+                    'demo_scheduled_date' => $request->demo_scheduled_date,
+                    'demo_scheduled_time' => $request->demo_scheduled_time,
+                    'meeting_link' => $request->meeting_link,
+                    'demo_status' => 'scheduled',
+                    'order_status' => 'pending',
+
+                ]);
+            }
+
+
+            DB::table('demo_schedule_entry')->insert([
+                'client_id' => $clientId,
+                'demo_website_id' => $orderStatusId,
+                'staff_id' => auth()->user()->id,
+                'website_for_demo' => $request->website,
+                'demo_scheduled_date' => $request->demo_scheduled_date,
+                'demo_scheduled_time' => $request->demo_scheduled_time,
+                'meeting_link' => $request->meeting_link,
+                'client_demo_status' => 'scheduled',
+                'order_status' => 'pending',
+            ]);
+        });
+
+        return response()->json(['success' => true, 'message' => 'Demo scheduled successfully!']);
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'message' => 'Failed to schedule demo: ' . $e->getMessage()], 500);
+    }
+
+    }
+
+    public function edit($id)
+    {
+        try {
+
+            $client = DB::table('demo_client_records')->where('id', $id)->first();
+
+
+            if (!$client) {
+                return response()->json(['message' => 'Client not found'], 404);
+            }
+
+
+            return response()->json($client);
+        } catch (\Exception $e) {
+
+            Log::error('Error fetching client data: ' . $e->getMessage());
+            return response()->json(['message' => 'Server error'], 500);
+        }
+    }
+
+    public function updateDemo(Request $request)
+    {
+        // Validate the incoming request data
+    $validatedData = $request->validate([
+        'client_id' => 'required|exists:demo_client_records,id', // Ensure client exists in the demo_client_records table
+        'contact_person' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'contact_number' => 'required|string|max:20',
+        'company_name' => 'required|string|max:255',
+        'address' => 'nullable|string|max:500',
+    ]);
+
+    // Use a DB query to update the client details in the demo_client_records table
+    $updated = DB::table('demo_client_records')
+                ->where('id', $request->client_id)
+                ->update([
+                    'contact_person' => $request->contact_person,
+                    'email' => $request->email,
+                    'contact_number' => $request->contact_number,
+                    'company_name' => $request->company_name,
+                    'address' => $request->address,
+                    'updated_at' => now(), // Optionally update the timestamp
+                ]);
+
+    // Check if the update was successful
+    if ($updated) {
+        return response()->json(['message' => 'Client details updated successfully.']);
+    } else {
+        return response()->json(['message' => 'Client update failed.'], 500);
+    }
+    }
+
+
+
+    public function rescheduleDemo(Request $request)
+    {
+    // Validation
+    $validator = \Validator::make($request->all(), [
+        'client_id' => 'required|exists:demo_client_records,id',
+        'website_id' => 'required|exists:demo_order_status,id',
+        'demo_scheduled_date' => 'required|date',
+        'demo_scheduled_time' => 'required',
+        'meeting_link' => 'nullable|url',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
+
+    // Start transaction for safety
+    DB::beginTransaction();
+
+    try {
+        // Insert into demo_schedule_entry table
+        DB::table('demo_schedule_entry')->insert([
+            'client_id' => $request->client_id,
+            'staff_id' => auth()->user()->id,
+            'demo_website_id' => $request->website_id,
+            'website_for_demo' => $request->website_demo,
+            'demo_scheduled_date' => $request->demo_scheduled_date,
+            'demo_scheduled_time' => $request->demo_scheduled_time,
+            'meeting_link' => $request->meeting_link,
+            'client_demo_status' => 'Rescheduled',
+            'order_status' => 'Pending',
+        ]);
+
+        // Update demo_order_status table
+        DB::table('demo_order_status')
+            ->where('id', $request->website_id)
+            ->where('client_id', $request->client_id)
+            ->update([
+                'demo_scheduled_date' => $request->demo_scheduled_date,
+                'demo_scheduled_time' => $request->demo_scheduled_time,
+                'meeting_link' => $request->meeting_link,
+                'demo_status' => 'Rescheduled', // Assuming 'demo_status' refers to client_demo_status
+                'order_status' => 'Pending',
+            ]);
+
+        // Commit transaction if both operations succeed
+        DB::commit();
+
+        return response()->json(['success' => true, 'message' => 'Demo rescheduled successfully.']);
+    } catch (\Exception $e) {
+        // Rollback transaction in case of error
+        DB::rollBack();
+
+        return response()->json(['success' => false, 'message' => 'Failed to reschedule demo.']);
+    }
+}
+
+    public function getScheduleInfo(Request $request)
+    {
+
+        $clientId = $request->client_id;
+        $websiteForDemo = $request->website_for_demo;
+
+
+    $scheduleInfo = DB::table('demo_order_status')
+        ->where('client_id', $clientId)
+        ->where('website_for_demo', $websiteForDemo)
+        ->select('demo_scheduled_date', 'demo_scheduled_time', 'meeting_link')
+        ->first();
+
+    if ($scheduleInfo) {
+        return response()->json($scheduleInfo);
+    } else {
+        return response()->json(['error' => 'No schedule information found'], 404);
+    }
+    }
+
+    // Update the demo status
+    public function updateDemoStatus(Request $request)
+    {
+        DB::table('demo_order_status')
+        ->where('id', $request->website_id)
+        ->update(['demo_status' => $request->demo_status]);
+
+        return response()->json(['success' => true]);
+    }
+
+
+
+    public function submitFeedback(Request $request)
+    {
+        $request->validate([
+            'feedback' => 'required|string|max:1000',
+        ]);
+
+        return redirect()->back()->with('success', 'Thank you for your feedback!');
+    }
+
+}
+
+
+
+
+
+
